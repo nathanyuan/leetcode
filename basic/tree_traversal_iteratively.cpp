@@ -9,6 +9,10 @@ struct TreeNode
     struct TreeNode *right;
 };
 
+bool is_leaf(struct TreeNode *node)
+{
+    return node->left == NULL && node->right == NULL;
+}
 
 void visit_node(struct TreeNode *node)
 {
@@ -19,17 +23,37 @@ void preorder_traversal(struct TreeNode *root)
 {
     if (root == NULL)
         return;
-    stack<struct TreeNode*> stack;
-    stack.push(root);
-    while (!stack.empty()) {
-        struct TreeNode *n = stack.top();
-        stack.pop();
+    stack<struct TreeNode*> s;
+    s.push(root);
+    while (!s.empty()) {
+        struct TreeNode *n = s.top();
+        s.pop();
         visit_node(n);
         if (n->right)
-            stack.push(n->right);
+            s.push(n->right);
         if (n->left)
-            stack.push(n->left);
+            s.push(n->left);
     } 
+}
+
+void preorder_traversal2(struct TreeNode *root)
+{
+    if (root == NULL)
+        return;
+    stack<struct TreeNode*> s;
+    s.push(root);
+    while (root || !s.empty()) {
+        while (root) {
+            visit_node(root);
+            s.push(root);
+            root = root->left;
+        }
+        if (!s.empty()) {
+            root = s.top();
+            s.pop();
+            root = root->right;
+        }
+    }
 }
 
 void inorder_traversal(struct TreeNode *root)
@@ -37,25 +61,19 @@ void inorder_traversal(struct TreeNode *root)
     if (root == NULL)
         return;
     stack<struct TreeNode*> stack;
-    stack.push(root);
-    while (!stack.empty()) {
-        struct TreeNode *n = stack.top(); 
-        if (n->left == NULL && n->right == NULL) {
+    //struct TreeNode *p = root;
+    while (root || !stack.empty()) {
+        while (root) {
+            stack.push(root);
+            root = root->left;
+        }
+        //if (!stack.empty()) {
+            root = stack.top();
             stack.pop();
-            visit_node(n);
-            continue;
-        }
-        if (n->left) {
-            stack.push(n->left);
-            continue;
-        }
-        else {
-            stack.pop();
-            visit_node(n);
-            stack.push(n->right);
-            continue;
-        }
-    } 
+            visit_node(root);
+            root = root->right;
+        //}
+    }
 }
 
 void postorder_traversal(struct TreeNode *root)
